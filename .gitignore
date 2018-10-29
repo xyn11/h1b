@@ -2,3 +2,4 @@ data/
 draft/
 *.pdf
 .DS_Store
+insight_testsuite/temp/
