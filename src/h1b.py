@@ -1,17 +1,24 @@
 import csv
+import argparse
 
-def read_csv(w):
-    f = open(w)
-    reader = csv.reader(f,delimiter = ';')
+def read_csv(filename):
+    '''
+    :type filename:str
+    :rtype: list 
+    '''
     data = []
-    for row in reader:
-        data.append(row)
-    f.close()
-    #for i in range(len(data)):
-     #   data[i] = data[i][0].split(';')
+    with open(filename) as f:
+        reader = csv.reader(f, delimiter = ';')
+        for row in reader:
+            data.append(row)
     return data
 
 def column_select(data, filters):
+    '''
+    :type data: list
+    :type filter: set #string of Column name needed
+    :rtype:list
+    '''
     records = [[] for _ in range(len(data))]
     filter_index = []
     for i in range(len(data[0])):
@@ -24,6 +31,10 @@ def column_select(data, filters):
     return records
 
 def certified_records(records):
+    '''
+    :type records:list
+    :rtype: list
+    '''
     t = 0
     certied_r = [records[0]]
     for i in range(len(records[0])):
@@ -36,6 +47,11 @@ def certified_records(records):
     return certied_r
 
 def get_rank(records, target):
+    '''
+    :type records: list
+    :type target:str  #SOC_NAME if output top 10 occupation, WORKSITE_STATE if output top 10 state
+    :rtype:list
+    '''
     index = 0
     n = len(records)
     for i in range(len(records[0])):
@@ -66,26 +82,38 @@ def get_rank(records, target):
     return rank
 
 
-def output_txt(records, filename):
-    f = open(filename, 'w+')
-    if filename == 'top_10_occupations.txt':
-        f.write('TOP_OCCUPATIONS;NUMBER_CERTIFIED_APPLICATIONS;PERCENTAGE\n')
-    else:
-        f.write('TOP_STATES;NUMBER_CERTIFIED_APPLICATIONS;PERCENTAGE\n')
-    for item in records:
-        for i in range(2):
-            f.write(item[i]+';')
-        f.write('{:0.1f}%'.format(item[2]*100)+'\n')
-    f.close()
+def output_txt(records, filename, is_occupations):
+    '''
+    :type records: list
+    :type filename: str
+    '''
+    with open(filename, 'w+') as f:
+        if is_occupations:
+            f.write('TOP_OCCUPATIONS;NUMBER_CERTIFIED_APPLICATIONS;PERCENTAGE\n')
+        else:
+            f.write('TOP_STATES;NUMBER_CERTIFIED_APPLICATIONS;PERCENTAGE\n')
+        for item in records:
+            for i in range(2):
+                f.write(item[i]+';')
+            f.write('{:0.1f}%'.format(item[2]*100)+'\n')
 
+def parse_args():
+    args = argparse.ArgumentParser()
+    args.add_argument('input', help='input file')
+    args.add_argument('occupations_output', help='output file for occupations')
+    args.add_argument('states_output', help='output file for states')
+    return args.parse_args()
 
-#w = '/Users/xyn/Documents/project/h1banalysis/2016n200.csv'
-w = '/Users/xyn/Documents/project/h1banalysis/H1B_FY_2016.csv'
-df = read_csv(w)
-filters = {'CASE_STATUS','VISA_CLASS','WORKSITE_STATE','SOC_NAME'}
-column_selected = column_select(df, filters)
-cer_records = certified_records(column_selected)
-occupation_ranked = get_rank(cer_records, 'SOC_NAME' )
-state_ranked = get_rank(cer_records,'WORKSITE_STATE')
-output_txt(occupation_ranked, 'top_10_occupations.txt')
-output_txt(state_ranked,'top_10_states.txt' )
+def main(args):
+    df = read_csv(args.input)
+    filters = ['CASE_STATUS','VISA_CLASS','WORKSITE_STATE','SOC_NAME']
+    column_selected = column_select(df, filters)
+    cer_records = certified_records(column_selected)
+    occupation_ranked = get_rank(cer_records, 'SOC_NAME' )
+    state_ranked = get_rank(cer_records, 'WORKSITE_STATE')
+    output_txt(occupation_ranked, args.occupations_output, True)
+    output_txt(state_ranked, args.states_output, False)
+
+if __name__ == '__main__':
+    args = parse_args()
+    main(args)
