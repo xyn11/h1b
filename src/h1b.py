@@ -4,7 +4,7 @@ import argparse
 def read_csv(filename):
     '''read csv data
     :filename: csv path
-    :type filename:str
+    :type filename: str
     :return: list of data 
     :rtype: list 
     '''
@@ -19,9 +19,9 @@ def column_select(data, filters):
     '''select useful columns from data
     :data: input data
     :type data: list
-    :filters: string of Column name needed
-    :type filter: set 
-    :rtype:list
+    :filters: list of string of column name needed
+    :type filter: list 
+    :rtype: list
     '''
     records = [[] for _ in range(len(data))]
     filter_index = []
@@ -37,7 +37,7 @@ def column_select(data, filters):
 def certified_records(records):
     '''keep certified H1B records only
     :records: input data
-    :type records:list
+    :type records: list
     :rtype: list
     '''
     t = 0
@@ -55,9 +55,8 @@ def get_rank(records, target):
     '''rank top 10 data according to target
     :records: input data
     :type records: list
-    :target: SOC_NAME if output top 10 occupation, WORKSITE_STATE if output top 10 state
+    :target: 'SOC_NAME' if output top 10 occupation, 'WORKSITE_STATE' if output top 10 state
     :type target: str
-    :type target:str  
     :rtype:list
     '''
     index = 0
@@ -94,7 +93,7 @@ def get_rank(records, target):
     return rank
 
 def output_txt(records, filename, is_occupations):
-    '''out put txt file 
+    '''output txt file 
     :records: input data
     :type records: list
     :filename: output filename
