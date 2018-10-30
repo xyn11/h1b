@@ -4,3 +4,5 @@ draft/
 .DS_Store
 insight_testsuite/temp/
 results.txt
+__pycache__/
+*.pyc

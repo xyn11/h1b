@@ -2,8 +2,10 @@ import csv
 import argparse
 
 def read_csv(filename):
-    '''
+    '''read csv data
+    :filename: csv path
     :type filename:str
+    :return: list of data 
     :rtype: list 
     '''
     data = []
@@ -14,9 +16,11 @@ def read_csv(filename):
     return data
 
 def column_select(data, filters):
-    '''
+    '''select useful columns from data
+    :data: input data
     :type data: list
-    :type filter: set #string of Column name needed
+    :filters: string of Column name needed
+    :type filter: set 
     :rtype:list
     '''
     records = [[] for _ in range(len(data))]
@@ -31,7 +35,8 @@ def column_select(data, filters):
     return records
 
 def certified_records(records):
-    '''
+    '''keep certified H1B records only
+    :records: input data
     :type records:list
     :rtype: list
     '''
@@ -47,9 +52,12 @@ def certified_records(records):
     return certied_r
 
 def get_rank(records, target):
-    '''
+    '''rank top 10 data according to target
+    :records: input data
     :type records: list
-    :type target:str  #SOC_NAME if output top 10 occupation, WORKSITE_STATE if output top 10 state
+    :target: SOC_NAME if output top 10 occupation, WORKSITE_STATE if output top 10 state
+    :type target: str
+    :type target:str  
     :rtype:list
     '''
     index = 0
@@ -64,28 +72,34 @@ def get_rank(records, target):
         if state in d:
             d[state] += 1
         else:
-            d[state] = 1
-    rank = []
-    val_nodup = sorted(list(set(d.values())), reverse = True)[:10]
+            d[state] = 1 
     d1 = dict()
     for key, val in d.items():
         if val in d1:
             d1[val].append(key)
         else:
             d1[val] = [key] 
-    for i in range(len(val_nodup)):
-        numbers = val_nodup[i]
+    val10 = sorted(d1.keys(), reverse = True)[:10]
+    cnt = 0
+    rank = []
+    for i in range(len(val10)):
+        numbers = val10[i]
         sorted_alpha = sorted(d1[numbers])
         for x in sorted_alpha:
             tmp = [x, str(numbers), numbers/(n-1)]
             rank.append(tmp)
+            cnt += 1
+        if cnt == 10:
+            break
     return rank
 
-
 def output_txt(records, filename, is_occupations):
-    '''
+    '''out put txt file 
+    :records: input data
     :type records: list
+    :filename: output filename
     :type filename: str
+    :is_occupations: Boolean value, True if output top 10 occupation, False if output top 10 states
     '''
     with open(filename, 'w+') as f:
         if is_occupations:
